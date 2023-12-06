@@ -1,10 +1,17 @@
 namespace SpriteKind {
     export const FireSource = SpriteKind.create()
+    export const thing = SpriteKind.create()
 }
 sprites.onCreated(SpriteKind.FireSource, function (sprite) {
     sprite.setPosition(randint(0, scene.screenWidth()), randint(0, scene.screenHeight()))
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    stuff()
+})
+sprites.onCreated(SpriteKind.thing, function (sprite) {
+    sprite.setPosition(randint(0, scene.screenWidth()), randint(0, scene.screenHeight()))
+})
+function stuff () {
     info.stopCountdown()
     while (info.life() > 1) {
         projectile = sprites.createProjectileFromSprite(img`
@@ -27,14 +34,40 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
             `, mySprite, randint(0, 100), randint(0, 100))
         info.changeScoreBy(1)
         info.changeLifeBy(-1)
-        pause(100)
+        pause(200)
     }
+    while (info.score() < 150) {
+        thingsprite = sprites.create(img`
+            . . . . . . . 8 . 8 . . . . . . 
+            . . . . . . . 8 9 8 . . . . . . 
+            . . . . . . . 8 9 8 . . . . . . 
+            . . . . . . . 8 9 8 . . . . . . 
+            . . . . . . . 6 9 6 . . . . . . 
+            . . . . . . 8 6 9 6 8 . . . . . 
+            . . . . . . 8 9 9 9 8 . . . . . 
+            . . . . . . 8 9 9 9 6 . . . . . 
+            . . . . . . 6 9 9 9 6 . . . . . 
+            . . . . . . 6 9 9 9 6 . . . . . 
+            . . . . . . 6 9 9 9 6 . . . . . 
+            . . . . . . 8 6 9 6 8 . . . . . 
+            . . . . . . . 8 8 8 . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.thing)
+        pause(2000)
+    }
+}
+sprites.onOverlap(SpriteKind.Player, SpriteKind.thing, function (sprite2, otherSprite) {
+    info.changeScoreBy(-1)
+    info.changeLifeBy(-10)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.FireSource, function (sprite2, otherSprite) {
     info.changeLifeBy(5)
     sprites.destroy(otherSprite)
 })
 let fire: Sprite = null
+let thingsprite: Sprite = null
 let projectile: Sprite = null
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
@@ -78,4 +111,17 @@ game.onUpdateInterval(500, function () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.FireSource)
+})
+game.onUpdateInterval(500, function () {
+    if (info.score() > 150) {
+        game.gameOver(true)
+        game.setGameOverEffect(true, effects.confetti)
+        game.setGameOverScoringType(game.ScoringType.HighScore)
+    }
+})
+game.onUpdateInterval(500, function () {
+    if (info.life() < 2) {
+        game.gameOver(false)
+        game.setGameOverEffect(false, effects.melt)
+    }
 })

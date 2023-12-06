@@ -2,7 +2,9 @@
     "name": "fireball",
     "description": "",
     "dependencies": {
-        "device": "*"
+        "device": "*",
+        "darts": "*",
+        "controller": "*"
     },
     "files": [
         "main.blocks",
